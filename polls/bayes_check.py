@@ -1,5 +1,6 @@
 import csv
 import string
+
 from bayes import NaiveBayesClassifier
 
 
@@ -15,7 +16,9 @@ for target, msg in data:
     X.append(msg)
     y.append(target)
 X = [clean(x).lower() for x in X]
-X_train, y_train, X_test, y_test = X[0:3900], y[0:3900], X[3900:], y[3900:]
+
+train = int((len(X)/100)*70)
+X_train, y_train, X_test, y_test = X[0:train], y[0:train], X[train:], y[train:] #X[train:], y[train:]
 
 model = NaiveBayesClassifier()
 model.fit(X_train, y_train)

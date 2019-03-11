@@ -9,7 +9,7 @@ def clean(s):
     return s.translate(translator)
 
 
-with open('SMSSpamCollection.txt', encoding='utf-8') as f:
+with open('static/SMSSpamCollection.txt', encoding='utf-8') as f:
     data = list(csv.reader(f, delimiter="\t"))
 X, y = [], []
 for target, msg in data:
@@ -85,55 +85,65 @@ for label in labels:
 print(L)
 
 
-"""
-for num in range(1):
+chance = {}
+alpha = 1
+for num in range(len(X)):
     string = X[num]
     string = string.split()
-    chance = {}
-    alpha = 1
+
     for word in string:
         chance[word] = [label for label in labels]
         for label in labels:
             chance[word][labels.index(label)] = (table[word][labels.index(label)] + alpha)/(V+L[label])
-    print(chance)
-"""
 
-print(p_labels)
-for line in X[:3]:
-    line_l = [i for i in p_labels]
-    words = line.split()
-    p_label_list = p_labels
-    for word in words:
-        for i in range(amount):
+
+
+
+
+
+
+
+
+def lll():
+    list = {}
+    for line in X:
+        list[line] = [i for i in p_labels]
+
+        words = line.split()
+        for word in words:
             if word in chance:
-                line_l[i] += math.log(chance[word][i])
-                print(math.log(chance[word][i]))
-    print(line_l)
-    for i in range(amount):
-        if line_l[i] == max(line_l):
-            labels.append(labels[i])
-            break
-print(labels)
+                for i in range(amount):
+                    list[line][i] += math.log(chance[word][i])
+    print(list)
+    return None
+
+lll()
+
 
 
 """
-        for k, v in p_label_list.items():
-                if v == maximum:
-                    print((num+1), k)
+def predict(X):
+    labels = []
+    classes = len(labels)
+    for string in X:
+        string_labels = [i for i in p_labels]
+        words = string.split()
+        for word in words:
+            if word in table[0]:
+                for i in range(classes):
+                    string_labels[i] += math.log(table[i + classes + 1][table[0].index(word)])
+        for i in range(classes):
+            if string_labels[i] == max(string_labels):
+                labels.append(labels[i])
+                break
+    return labels
 
 
-    maximum = max(p_label_list.values())
-    for k, v in p_label_list.items():
-            if v == maximum:
-                print((num+1), k)
+predict(X)
 """
 
 
-#Переработать L
-#Дописать if not in (если слова не было в обучающей выборке)
 
 
 
-#print(X[0])
-#print(X[0].split())
-#print(table)
+#

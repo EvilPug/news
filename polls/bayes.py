@@ -3,17 +3,18 @@ import collections
 
 class NaiveBayesClassifier:
 
-    def __init__(self, alpha):
+    def __init__(self, alpha=1):
         self.alpha = alpha
-        self.labels = []
-        self.table = []
+        self.chance = {}
         self.p_labels = []
+        self.amount = 0
+        self.labels = []
 
     def fit(self, X, y):
         """ Fit Naive Bayes classifier according to X, y. """
-        labels = [i for i in set(y)]
-        labels.sort()
-        amount = len(labels)
+        self.labels = [i for i in set(y)]
+        self.labels.sort()
+        self.amount = len(self.labels)
 
         dict = [[] for l in range(len(X))]
         for i in range(len(X)):
@@ -24,64 +25,82 @@ class NaiveBayesClassifier:
             words = X[i].split()
             for word in words:
                 if word not in table:
-                    table[word] = [0]*amount
-                if dict[i][1] == labels[0]:
+                    table[word] = [0]*self.amount
+                if dict[i][1] == self.labels[0]:
                     table[word][0] += 1
-                elif dict[i][1] == labels[1]:
+                elif dict[i][1] == self.labels[1]:
                     table[word][1] += 1
-                elif dict[i][1] == labels[2]:
+                elif dict[i][1] == self.labels[2]:
                     table[word][2] += 1
-                elif dict[i][1] == labels[3]:
+                elif dict[i][1] == self.labels[3]:
                     table[word][3] += 1
-                elif dict[i][1] == labels[4]:
+                elif dict[i][1] == self.labels[4]:
                     table[word][4] += 1
 
-        for i in range(amount):
+        for i in range(self.amount):
             counter = collections.Counter()
             for j in dict:
                 counter[j[1]] += 1
 
         #log (Dc/D)
         D = len(dict)
-        p_labels = [math.log(counter[label] / D) for label in labels]
+        self.p_labels = [math.log(counter[label] / D) for label in self.labels]
+
+
 
         #Количество уникальных слов
         V = len(table)
 
         #Cуммарное количество слов по классам (label)
         L = {}
-        for label in labels:
+        for label in self.labels:
             L[label] = 0
             for word in table:
-                L[label] += table[word][labels.index(label)]
+                L[label] += table[word][self.labels.index(label)]
 
-
+        for num in range(len(X)):
+            string = X[num]
+            string = string.split()
+            #print(string)
+            for word in string:
+                self.chance[word] = [label for label in self.labels]
+                for label in self.labels:
+                    self.chance[word][self.labels.index(label)] = (table[word][self.labels.index(label)] + self.alpha)/(V+L[label])
 
 
     def predict(self, X):
         """ Perform classification on an array of test vectors X. """
+
+        list = {}
         for line in X:
-            line_l = [i for i in p_labels]
+            list[line] = [i for i in self.p_labels]
+            print
             words = line.split()
-            p_label_list = p_labels
             for word in words:
-                for i in range(amount):
-                    if word in chance:
-                        line_l[i] += math.log(chance[word][i])
+                if word in self.chance:
+                    for i in range(len(self.labels)):
+                        list[line][i] += math.log(self.chance[word][i])
 
-            maximum = max(line_l)
-            for i in range(amount):
-                if line_l[i] == maximum:
-                    predicted += v
-        return predicted
-
+            for i in range(len(self.labels)):
+                if list[line][i] == max(list[line]):
+                    list[line] = self.labels[i]
+                    break
+        return list
 
 
     def score(self, X_test, y_test):
         """ Returns the mean accuracy on the given test data and labels. """
-        count = 0
-        for i, data in enumerate(X_test):
-            if self.predict(data) == y_test[i]:
-                count += 1
+        test = self.predict(X_test)
+        correct = 0
+        testdict = {}
 
-        return count / len(X_test)
+        for line, label in zip(X_test, y_test):
+            testdict[line] = label
+
+        for line in X_test:
+            if test[line] == testdict[line]:
+                correct += 1
+        return correct / len(y_test)
+
+if __name__ == '__main__':
+    print('OK')

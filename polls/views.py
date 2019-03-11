@@ -16,6 +16,8 @@ def index(request):
 def admin(request):
     return HttpResponse("Admin panel here")
 
+def login(request):
+    return HttpResponse("Login  here")
 
 def add_label(request):
     rows = NewsModel.objects.filter(label=None)
@@ -46,20 +48,31 @@ def update_news(request):
 
 
 def recommendations(request):
-	s = session()
-	classifier = NaiveBayesClassifier()
-	
-	labeled_news = s.query(News).filter(News.title not in x_train and News.label != None).all()
-	X_train = [row.title for row in recently_marked_news]
-	y_train = [row.label for row in recently_marked_news]
-	classifier.fit(X_train, y_train)
-	
-	blank_rows = s.query(News).filter(News.label == None).all()
-	X = [row.title for row in blank_rows]
-	labels = classifier.predict(X)
-	good = [blank_rows[i] for i in range(len(blank_rows)) if labels[i] == '2']
-	maybe = [blank_rows[i] for i in range(len(blank_rows)) if labels[i] == '1']
-	never = [blank_rows[i] for i in range(len(blank_rows)) if labels[i] == '0']
-	
-	return render(request, 'recommendations.html', {'good': good, 'maybe':maybe, 'never': never})
+    classifier = NaiveBayesClassifier()
+    rows = NewsModel.objects.exclude(label=None)
+    X_train = [row.title for row in rows]
+    y_train = [row.label for row in rows]
+    classifier.fit(X_train, y_train)
 
+
+    unlabeled_rows = NewsModel.objects.filter(label=None)
+    x = [row.title for row in unlabeled_rows]
+    predicted = classifier.predict(x)
+
+    good = []
+    maybe = []
+    never = []
+    print(len(unlabeled_rows))
+
+    try:
+        for i in range(len(unlabeled_rows)):
+            if list(predicted.values())[i] == '0':
+                never.append(unlabeled_rows[i])
+            elif list(predicted.values())[i] == '1':
+                maybe.append(unlabeled_rows[i])
+            elif list(predicted.values())[i] == '2':
+                good.append(unlabeled_rows[i])
+    except IndexError:
+        print('Percentage of predicted news: ', len(predicted.values())/len(unlabeled_rows))
+
+    return render(request, 'recommendations.html', {'good': good,'never': never,'maybe':maybe})
