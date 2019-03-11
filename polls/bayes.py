@@ -21,27 +21,25 @@ class NaiveBayesClassifier:
             dict[i] = [X[i], y[i]]
 
         table = {}
+        
         for i in range(len(X)):
             words = X[i].split()
             for word in words:
-                if word not in table:
-                    table[word] = [0]*self.amount
-                if dict[i][1] == self.labels[0]:
-                    table[word][0] += 1
-                elif dict[i][1] == self.labels[1]:
-                    table[word][1] += 1
-                elif dict[i][1] == self.labels[2]:
-                    table[word][2] += 1
-                elif dict[i][1] == self.labels[3]:
-                    table[word][3] += 1
-                elif dict[i][1] == self.labels[4]:
-                    table[word][4] += 1
+                table[word] = [0]*self.amount
+
+        for k in range(self.amount):
+            for i in range(len(X)):
+                words = X[i].split()
+                for word in words:
+                    if dict[i][1] == self.labels[k]:
+                        table[word][k] += 1
+        print(table)
+
 
         for i in range(self.amount):
             counter = collections.Counter()
             for j in dict:
                 counter[j[1]] += 1
-
         #log (Dc/D)
         D = len(dict)
         self.p_labels = [math.log(counter[label] / D) for label in self.labels]
