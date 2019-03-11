@@ -61,7 +61,6 @@ class NaiveBayesClassifier:
         for num in range(len(X)):
             string = X[num]
             string = string.split()
-            #print(string)
             for word in string:
                 self.chance[word] = [label for label in self.labels]
                 for label in self.labels:
@@ -74,7 +73,6 @@ class NaiveBayesClassifier:
         list = {}
         for line in X:
             list[line] = [i for i in self.p_labels]
-            print
             words = line.split()
             for word in words:
                 if word in self.chance:
