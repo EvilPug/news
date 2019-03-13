@@ -2,12 +2,11 @@ from django.shortcuts import render, HttpResponse, redirect
 from .scraputils import get_news
 from .db import News, session, save
 from .models import NewsModel
-
 from .bayes import NaiveBayesClassifier
 
 
 def index(request):
-    #import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
     rows = NewsModel.objects.filter(label=None)
     count = len(rows)
     return render(request, 'index.html', {'rows': rows, 'count': count})
@@ -16,8 +15,10 @@ def index(request):
 def admin(request):
     return HttpResponse("Admin panel here")
 
+
 def login(request):
     return HttpResponse("Login  here")
+
 
 def add_label(request):
     rows = NewsModel.objects.filter(label=None)
@@ -26,9 +27,10 @@ def add_label(request):
         label = request.POST['label'].split(' ')[0]
         id = request.POST['label'].split(' ')[1]
         change = NewsModel.objects.get(id=id)
-        change.label=label
+        change.label = label
         change.save()
     return redirect('/', {'rows': rows})
+
 
 def update_news(request):
     rows = NewsModel.objects.all()
@@ -54,7 +56,6 @@ def recommendations(request):
     y_train = [row.label for row in rows]
     classifier.fit(X_train, y_train)
 
-
     unlabeled_rows = NewsModel.objects.filter(label=None)
     x = [row.title for row in unlabeled_rows]
     predicted = classifier.predict(x)
@@ -73,6 +74,8 @@ def recommendations(request):
             elif list(predicted.values())[i] == '2':
                 good.append(unlabeled_rows[i])
     except IndexError:
-        print('Percentage of predicted news: ', len(predicted.values())/len(unlabeled_rows))
+        print('Percentage of predicted news: ',
+              len(predicted.values())/len(unlabeled_rows))
 
-    return render(request, 'recommendations.html', {'good': good,'never': never,'maybe':maybe})
+    return render(request, 'recommendations.html',
+                  {'good': good, 'never': never, 'maybe': maybe})

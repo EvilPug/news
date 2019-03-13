@@ -3,7 +3,7 @@ import time
 from bs4 import BeautifulSoup
 
 
-def extract_news(parser):
+def extract_news(parser) -> list:
     """ Extract news from a given web page """
     news_list = []
     tbl_list = parser.table.find_all('table')
@@ -32,17 +32,18 @@ def extract_news(parser):
                            points)]
 
             n += 3
-
     return news_list
 
 
 def extract_next_page(parser):
     """ Extract next page URL """
+
     return parser.find("a", {"class": "morelink"}).get('href')
 
 
-def get_news(url, n_pages=1):
+def get_news(url: str, n_pages=1) -> list:
     """ Collect news from a given web page """
+
     news = []
     while n_pages:
         print("Collecting data from page: {}".format(url))

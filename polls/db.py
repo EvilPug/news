@@ -22,6 +22,7 @@ class News(Base):
 
 Base.metadata.create_all(bind=engine)
 
+
 def save(news_list):
     s = session()
     for new in news_list:

@@ -1,6 +1,7 @@
 import math
 import collections
 
+
 class NaiveBayesClassifier:
 
     def __init__(self, alpha=1):
@@ -10,7 +11,7 @@ class NaiveBayesClassifier:
         self.amount = 0
         self.labels = []
 
-    def fit(self, X, y):
+    def fit(self, X: list, y: list) -> None:
         """ Fit Naive Bayes classifier according to X, y. """
         self.labels = [i for i in set(y)]
         self.labels.sort()
@@ -21,7 +22,7 @@ class NaiveBayesClassifier:
             dict[i] = [X[i], y[i]]
 
         table = {}
-        
+
         for i in range(len(X)):
             words = X[i].split()
             for word in words:
@@ -33,23 +34,17 @@ class NaiveBayesClassifier:
                 for word in words:
                     if dict[i][1] == self.labels[k]:
                         table[word][k] += 1
-        print(table)
-
 
         for i in range(self.amount):
             counter = collections.Counter()
             for j in dict:
                 counter[j[1]] += 1
-        #log (Dc/D)
+
         D = len(dict)
         self.p_labels = [math.log(counter[label] / D) for label in self.labels]
 
-
-
-        #Количество уникальных слов
         V = len(table)
 
-        #Cуммарное количество слов по классам (label)
         L = {}
         for label in self.labels:
             L[label] = 0
@@ -62,10 +57,13 @@ class NaiveBayesClassifier:
             for word in string:
                 self.chance[word] = [label for label in self.labels]
                 for label in self.labels:
-                    self.chance[word][self.labels.index(label)] = (table[word][self.labels.index(label)] + self.alpha)/(V+L[label])
+                    self.chance[word][self.labels.index(label)] =\
+                        (table[word][self.labels.index(label)] + self.alpha) /\
+                        (V+L[label])
 
+        return None
 
-    def predict(self, X):
+    def predict(self, X: list) -> dict:
         """ Perform classification on an array of test vectors X. """
 
         list = {}
@@ -83,9 +81,9 @@ class NaiveBayesClassifier:
                     break
         return list
 
-
-    def score(self, X_test, y_test):
+    def score(self, X_test: list, y_test: list) -> float:
         """ Returns the mean accuracy on the given test data and labels. """
+
         test = self.predict(X_test)
         correct = 0
         testdict = {}
