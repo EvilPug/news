@@ -17,7 +17,9 @@ for target, msg in data:
     y.append(target)
 X = [clean(x).lower() for x in X]
 
-train = int((len(X)/100)*70)
+p = 70
+
+train = int((len(X)/100)*p)
 X_train, y_train, X_test, y_test = X[0:train], y[0:train], X[train:], y[train:] #X[train:], y[train:]
 
 model = NaiveBayesClassifier()
