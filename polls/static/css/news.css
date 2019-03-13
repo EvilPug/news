@@ -20,7 +20,7 @@
 }
 
 .rate:not(:checked)>label:before {
-	content: '🖏 ';
+	content: 'О';
 }
 
 .rate>input:checked~label {
@@ -43,7 +43,7 @@
 .row {
 	margin-top: 60px;
 	padding: 0 10px;
-  width: 1200px;
+	width: 1200px;
 }
 
 .clickable {
