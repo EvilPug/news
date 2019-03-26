@@ -1,6 +1,5 @@
 from django.shortcuts import render, HttpResponse, redirect
 from .scraputils import get_news
-from .db import News, session, save
 from .models import NewsModel
 from .bayes import NaiveBayesClassifier
 
@@ -34,18 +33,23 @@ def add_label(request):
 
 def update_news(request):
     rows = NewsModel.objects.all()
-    n = request.POST['n_pages']
-    n = int(n)
+    n = int(request.POST['n_pages'])
     list = get_news("https://news.ycombinator.com/newest", n_pages=n)
     update_list = []
-
     url_list = [row.url for row in rows]
 
     for news in list:
         if news[2] not in url_list:
-            print(news[0])
-            update_list.append(news)
-    save(update_list)
+
+            s = NewsModel(title=news[0],
+                        author=news[1],
+                        url=news[2],
+                        comments=news[3],
+                        points=news[4],
+                        label = None)
+
+            s.save()
+            print(s.id, s.title)
     return redirect('/', {'rows': rows})
 
 
