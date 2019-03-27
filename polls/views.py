@@ -1,7 +1,10 @@
-from django.shortcuts import render, HttpResponse, redirect
+import hashlib
+import time
+from .models import NewsModel, Users
 from .scraputils import get_news
-from .models import NewsModel
 from .bayes import NaiveBayesClassifier
+from django.shortcuts import render, HttpResponse, redirect
+
 
 
 def index(request):
@@ -14,10 +17,43 @@ def index(request):
 def admin(request):
     return HttpResponse("Admin panel here")
 
+def signup(request):
+    if request.POST:
+        users = Users.objects.all()
+        for user in users:
+            if user.username == request.POST['username']:
+                return HttpResponse("User alredy exist!")
+            else:
+                if len(request.POST['username']) <= 20:
+                    encode = request.POST['password'].encode()
+                    hashed_pass = hashlib.md5(encode).hexdigest()
+                    u = Users(username = request.POST['username'],
+                              password = hashed_pass)
+                    u.save()
+                    print("New user: ", request.POST['username'])
+                    return redirect('/')
+                else:
+                    return HttpResponse("Username max_length is 20")
+    return render(request, 'signup.html')
 
 def login(request):
-    return HttpResponse("Login  here")
+    rows = NewsModel.objects.filter(label=None)
+    count = len(rows)
 
+    if request.POST:
+        users = Users.objects.all()
+        l = request.get_full_path()
+        print(l)
+        username = request.POST['username']
+        password = request.POST['password'].encode()
+        h = hashlib.md5(password).hexdigest()
+
+        for user in users:
+            if user.username == username and h == user.password:
+                return render(request, 'index.html', {'rows': rows, 'count': count})
+            else:
+                return HttpResponse("Login or password incorrect")
+    return render(request, 'login.html')
 
 def add_label(request):
     rows = NewsModel.objects.filter(label=None)
@@ -42,11 +78,11 @@ def update_news(request):
         if news[2] not in url_list:
 
             s = NewsModel(title=news[0],
-                        author=news[1],
-                        url=news[2],
-                        comments=news[3],
-                        points=news[4],
-                        label = None)
+                         author=news[1],
+                         url=news[2],
+                         comments=news[3],
+                         points=news[4],
+                         label = None)
 
             s.save()
             print(s.id, s.title)
@@ -82,4 +118,4 @@ def recommendations(request):
               len(predicted.values())/len(unlabeled_rows))
 
     return render(request, 'recommendations.html',
-                  {'good': good, 'never': never, 'maybe': maybe})
+                  {'good': good, 'maybe': maybe, 'never': never})
