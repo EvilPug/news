@@ -23,7 +23,8 @@
         </form>
 
         <div class="row">
-		        <a href = "recommendations/" center=True>Рекомендации</a>
+          <p align=right>Welcome, {{user}}</p>
+            <a href = "recommendations/" center=True>Рекомендации</a>
             <div class="panel panel-primary filterable">
               Непрочитанных новостей:<h5 class = "counter">{{count}}</h5>
                 <div class="panel-heading">
@@ -53,11 +54,11 @@
                             <td><form action="add_label/" method="post">
                               {% csrf_token %}
                                 <div class = "rate">
-                                  <input type="submit" id="star2{{row.id}}" name="label" value="2 {{row.id}}" />
+                                  <input type="submit" id="star2{{row.id}}" name="label" value="{{row.id}}:2" />
                                   <label for="star2{{row.id}}" title="Интересно">2 stars</label>
-                                  <input type="submit" id="star1{{row.id}}" name="label" value="1 {{row.id}}" />
+                                  <input type="submit" id="star1{{row.id}}" name="label" value="{{row.id}}:1" />
                                   <label for="star1{{row.id}}" title="Возможно интересно">1 stars</label>
-                                  <input type="submit" id="star0{{row.id}}" name="label" value="0 {{row.id}}" />
+                                  <input type="submit" id="star0{{row.id}}" name="label" value="{{row.id}}:0" />
                                   <label for="star0{{row.id}}" title="Не интеренсно">0 star</label>
                                 </div>
                                 </form></td>
