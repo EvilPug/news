@@ -54,7 +54,7 @@ def get_news(url: str, n_pages=1) -> list:
         url = "https://news.ycombinator.com/" + next_page
         news.extend(news_list)
         n_pages -= 1
-        time.sleep(3)
+        time.sleep(5)
     return news
 
 if __name__ == '__main__':

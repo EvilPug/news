@@ -1,4 +1,3 @@
-import os
 import time
 import hashlib
 import requests
@@ -17,6 +16,13 @@ def index(request):
 
 
 def admin(request):
+    user = request.session['username']
+    news = NewsModel.objects.exclude(label=None)
+
+    list = ''
+    for new in news:
+        list += ' ' + str(new.id)+':'+new.label
+    print(list)
     return HttpResponse("Admin panel here")
 
 def signup(request):
@@ -28,8 +34,6 @@ def signup(request):
                 return HttpResponse("User alredy exist!")
             else:
                 if len(username) <= 20:
-                    # open(os.path.dirname(os.path.abspath(__file__)) + "/userdata/"+ username + ".csv", mode='w')
-
                     encode = request.POST['password'].encode()
                     hashed_pass = hashlib.md5(encode).hexdigest()
                     u = Users(username = username,
@@ -44,49 +48,83 @@ def signup(request):
     return render(request, 'signup.html')
 
 def login(request):
-    if request.session['username']:
+
+    try:
         user = Users.objects.get(username=request.session['username'])
         if request.session['password'] == user.password:
 
-            rows = NewsModel.objects.filter(label=None)
+            if user.news_labeled != '':
+                labels = set(user.news_labeled.split(" "))
+                ids = []
+                for i in list(labels):
+                    ids += [i.split(':')[0]]
+
+                rows = NewsModel.objects.exclude(pk__in=ids)
+            else:
+                rows = NewsModel.objects.all()
+
             count = len(rows)
-            return render(request, 'index.html', {'rows': rows, 'count': count, 'user':request.session['username']})
+            return render(request,
+                          'index.html',
+                          {'rows': rows,
+                           'count': count,
+                           'user':request.session['username']
+                          }
+                         )
         else:
             return render(request, 'login.html')
-    elif request.POST:
+    except KeyError:
+        pass
+
+    if request.POST:
         try:
             user = Users.objects.get(username=request.POST['username'])
             hashed = hashlib.md5(request.POST['password'].encode()).hexdigest()
 
             if hashed == user.password:
-                request.session['username']=user.username
-                request.session['password']=hashed
+                request.session['username'] = user.username
+                request.session['password'] = hashed
 
                 rows = NewsModel.objects.filter(label=None)
                 count = len(rows)
-                return render(request, 'index.html', {'rows': rows, 'count': count})
+                return render(request,
+                              'index.html',
+                              {'rows': rows,
+                               'count': count,
+                               'user':request.session['username']
+                              }
+                             )
 
         except Users.DoesNotExist:
             return HttpResponse("Login or password invalid")
     return render(request, 'login.html')
 
+def logout(request):
+    try:
+        del request.session['username']
+        del request.session['password']
+    except KeyError:
+        pass
+    return HttpResponse("Logged out")
+
 def add_label(request):
     rows = NewsModel.objects.filter(label=None)
+
     if request.POST:
-        print(request.session['username'])
-        row = request.POST['label']
-        id = request.POST['label'].split(':')[0]
-        label = request.POST['label'].split(':')[1]
-        change = NewsModel.objects.get(id=id)
-        change.label = label
-        change.save()
+        user = request.session['username']
+        add = Users.objects.get(username=user)
+        if add.news_labeled == "":
+            add.news_labeled = request.POST['label']
+
+        add.news_labeled += " " + request.POST['label']
+        add.save()
     return redirect('/', {'rows': rows})
 
 
 def update_news(request):
     rows = NewsModel.objects.all()
     n = int(request.POST['n_pages'])
-    list = get_news("https://news.ycombinator.com/newest", n_pages=n)
+    list = get_news("https://news.ycombinator.com/newest?next=19488853&n=1", n_pages=n)
     update_list = []
     url_list = [row.url for row in rows]
 
@@ -107,31 +145,47 @@ def update_news(request):
 
 def recommendations(request):
     classifier = NaiveBayesClassifier()
-    rows = NewsModel.objects.exclude(label=None)
-    X_train = [row.title for row in rows]
-    y_train = [row.label for row in rows]
-    classifier.fit(X_train, y_train)
-
-    unlabeled_rows = NewsModel.objects.filter(label=None)
-    x = [row.title for row in unlabeled_rows]
-    predicted = classifier.predict(x)
+    user = request.session['username']
+    n_labels = Users.objects.get(username=user).news_labeled
 
     good = []
     maybe = []
     never = []
-    print(len(unlabeled_rows))
 
-    try:
-        for i in range(len(unlabeled_rows)):
-            if list(predicted.values())[i] == '0':
-                never.append(unlabeled_rows[i])
-            elif list(predicted.values())[i] == '1':
-                maybe.append(unlabeled_rows[i])
-            elif list(predicted.values())[i] == '2':
-                good.append(unlabeled_rows[i])
-    except IndexError:
-        print('Percentage of predicted news: ',
-              len(predicted.values())/len(unlabeled_rows))
+    if n_labels != '':
+        labels = set(n_labels.split(" "))
+        ids = []
+        y_train = []
+        for i in list(labels):
+            ids += [i.split(':')[0]]
+            y_train += [i.split(':')[1]]
 
+            print(i.split(':')[0])
+        rows = NewsModel.objects.filter(pk__in=ids)
+
+
+        X_train = [row.title for row in rows]
+
+        classifier.fit(X_train, y_train)
+
+        unlabeled_rows = NewsModel.objects.all()
+        x = [row.title for row in unlabeled_rows]
+        predicted = classifier.predict(x)
+
+        try:
+            for i in range(len(unlabeled_rows)):
+                if list(predicted.values())[i] == '0':
+                    never.append(unlabeled_rows[i])
+                elif list(predicted.values())[i] == '1':
+                    maybe.append(unlabeled_rows[i])
+                elif list(predicted.values())[i] == '2':
+                    good.append(unlabeled_rows[i])
+        except IndexError:
+            print('Percentage of predicted news: ',
+                  len(predicted.values())/len(unlabeled_rows))
+    else:
+        good = ['Go label some news!']
+        maybe = ['Go label some news!']
+        never = ['Go label some news!']
     return render(request, 'recommendations.html',
                   {'good': good, 'maybe': maybe, 'never': never})
