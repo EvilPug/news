@@ -1,2 +1,4 @@
-/polls/migrations
-/polls/__pycache__
+src/polls/__pycache__
+src/polls/migrations
+__init__.py
+*.pyc

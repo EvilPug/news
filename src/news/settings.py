@@ -25,11 +25,7 @@ SECRET_KEY = '9nss9)$cq&rn+1dl%hdsrf2z+jf78_x$72+9)(ahq-n$y0*riy'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-	'192.168.0.105',
-	'127.0.0.1',
-    'hybridcraft.ru',
-]
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition

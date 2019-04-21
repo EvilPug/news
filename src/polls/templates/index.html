@@ -8,29 +8,48 @@
     <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="image/png">
     <link href="{% static 'css/news.css' %}" rel="stylesheet" type="text/css">
 
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'jquery/jquery-1.11.1.min.js' %}"></script>
+    <link rel="stylesheet" href="{%static 'css/bootstrap3-4-0.min.css' %}">
+    <script src="{%static 'jquery/jquery.min.js' %}"></script>
+    <script src="{%static 'js/bootstrap.min.js' %}"></script>
   </head>
-
   <body>
       <div class="container">
-        <h5>Загрузить больше новостей:</h5>
-        <form action="update_news/" method="post">
-            {% csrf_token %}
-            <th><input type="text" name="n_pages" class="form-control" placeholder="Введите число страниц"></th>
-            <th><input type="submit" class="btn btn-primary"></th>
-        </form>
-
-        <div class="row">
-          <p align=right>Welcome, {{user}}   <a href = "logout/" center=True>Logout</a></p>
-            <a href = "recommendations/" center=True>Рекомендации</a>
-            <div class="panel panel-primary filterable">
-              Непрочитанных новостей:<h5 class = "counter">{{count}}</h5>
-                <div class="panel-heading">
-                    <h3 class="panel-title"><center>News</center></h3>
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <a class="navbar-brand" href="#">Hybrid</a>
+            </div>
+            {%if user == 'evillpug'%}
+            <form class="navbar-form navbar-left" action="update_news/" method="post">
+              <div class="input-group">
+                {% csrf_token %}
+                <input type="text" name="n_pages" class="form-control" placeholder="Число страниц">
+                <div class="input-group-btn">
+                  <button class="btn btn-default" type="submit">
+                    <i>Go</i>
+                  </button>
                 </div>
+              </div>
+            </form>
+            {%endif%}
 
+            <ul class="nav navbar-nav">
+              <li><a href="recommendations/">Рекомендации</a></li>
+              <li><a href="#">Избранное</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">{{user}}<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><a href="logout/">Logout</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </nav>
+        <div class="row">
+            <div class="panel panel-default filterable">
+              <h5 class = "counter">Непрочитанных новостей: {{count}}</h5>
                 <script type="text/javascript" src ="{% static 'js/news.js' %}"></script>
                 <table class="table">
                     <thead>
