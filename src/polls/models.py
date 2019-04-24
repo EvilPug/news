@@ -24,3 +24,6 @@ class Users(models.Model):
     password = models.CharField(max_length = 20)
     news_labeled =  models.CharField(max_length = 4000)
     favorite = models.CharField(max_length = 400)
+
+    def __str__(self):
+        return self.username

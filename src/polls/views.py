@@ -4,6 +4,7 @@ import requests
 from .models import NewsModel, Users
 from .scraputils import get_news
 from .bayes import NaiveBayesClassifier
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, HttpResponse, redirect
 
 
@@ -85,7 +86,12 @@ def login(request):
                 request.session['username'] = user.username
                 request.session['password'] = hashed
 
-                rows = NewsModel.objects.filter(label=None)
+                labels = set(user.news_labeled.split(" "))
+                ids = []
+                for i in list(labels):
+                    ids += [i.split(':')[0]]
+
+                rows = NewsModel.objects.exclude(pk__in=ids)
                 count = len(rows)
                 return render(request,
                               'index.html',
@@ -99,6 +105,7 @@ def login(request):
             return HttpResponse("Login or password invalid")
     return render(request, 'login.html')
 
+@login_required
 def logout(request):
     try:
         del request.session['username']
@@ -107,6 +114,7 @@ def logout(request):
         pass
     return HttpResponse("Logged out")
 
+@login_required
 def add_label(request):
     rows = NewsModel.objects.filter(label=None)
 
@@ -120,7 +128,7 @@ def add_label(request):
         add.save()
     return redirect('/', {'rows': rows})
 
-
+@login_required
 def update_news(request):
     rows = NewsModel.objects.all()
     n = int(request.POST['n_pages'])
@@ -142,7 +150,7 @@ def update_news(request):
             print(s.id, s.title)
     return redirect('/', {'rows': rows})
 
-
+@login_required
 def recommendations(request):
     classifier = NaiveBayesClassifier()
     user = request.session['username']
@@ -160,7 +168,6 @@ def recommendations(request):
             ids += [i.split(':')[0]]
             y_train += [i.split(':')[1]]
 
-            print(i.split(':')[0])
         rows = NewsModel.objects.filter(pk__in=ids)
 
 
@@ -187,5 +194,16 @@ def recommendations(request):
         good = ['Go label some news!']
         maybe = ['Go label some news!']
         never = ['Go label some news!']
-    return render(request, 'recommendations.html',
+    return render(request, 'test.html',
                   {'good': good, 'maybe': maybe, 'never': never})
+
+
+@login_required
+def favorite(request):
+
+    user = Users.objects.get(username=request.session['username'])
+    print(user)
+    labels = set(user.favorite.split(" "))
+
+    fav_news = NewsModel.objects.filter(pk__in=labels)
+    return render(request, 'favorite.html', {'fav_news': fav_news})
