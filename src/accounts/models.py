@@ -30,12 +30,15 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    username = models.CharField(max_length = 15, unique=True)
     email = models.EmailField(db_index=True, unique=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    USERNAME_FIELD = 'email'
+    news_labeled =  models.CharField(max_length = 4000)
+    favorite = models.CharField(max_length = 400)
+    USERNAME_FIELD = 'username'
 
     objects = UserManager()
 
     def __str__(self):
-        return self.email
+        return self.username

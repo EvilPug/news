@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.utils import timezone
-from polls.models import NewsModel, Users
+from polls.models import NewsModel
 
 class NewsModelTests(TestCase):
 

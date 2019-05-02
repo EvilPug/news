@@ -17,13 +17,3 @@ class NewsModel(models.Model):
     def was_added_recently(self):
         now = timezone.now()
         return now - timezone.timedelta(days=1) <= self.added_date <= now
-
-class Users(models.Model):
-    id = models.AutoField(max_length=5, primary_key = True)
-    username = models.CharField(max_length = 15)
-    password = models.CharField(max_length = 20)
-    news_labeled =  models.CharField(max_length = 4000)
-    favorite = models.CharField(max_length = 400)
-
-    def __str__(self):
-        return self.username

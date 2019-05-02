@@ -1,7 +1,7 @@
 {% load staticfiles %}
 <html lang="ru">
   <head>
-    <title>News</title>
+    <title>Recommended News</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -19,7 +19,7 @@
             <div class="navbar-header">
               <a class="navbar-brand" href="/">Hybrid</a>
             </div>
-            {%if user == 'evillpug'%}
+            {%if user.username == 'evilpug'%}
             <form class="navbar-form navbar-left" action="update_news/" method="post">
               <div class="input-group">
                 {% csrf_token %}
@@ -34,22 +34,25 @@
             {%endif%}
 
             <ul class="nav navbar-nav">
-              <li><a href="recommendations/">Рекомендации</a></li>
-              <li><a href="favorite/">Избранное</a></li>
+              <li><a href="{% url 'polls:recommendations' %}">Рекомендации</a></li>
+              <li><a href="{% url 'polls:favorite' %}">Избранное</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
               <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">{{user}}<span class="caret"></span></a>
+                {% if user.is_authenticated %}
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">{{ user.username }}<span class="caret"></span></a>
                 <ul class="dropdown-menu">
-                  <li><a href="logout/">Logout</a></li>
+                  <li><a href="{% url 'accounts:logout' %}">Logout</a></li>
                 </ul>
+                {% else %}
+                <a class="dropdown-toggle" data-toggle="dropdown" href="/accounts/login/">Login<span class="caret"></span></a>
+                {% endif %}
               </li>
             </ul>
           </div>
         </nav>
         <div class="row">
             <div class="panel panel-default filterable">
-              <h5 class = "counter">Непрочитанных новостей: {{count}}</h5>
                 <script type="text/javascript" src ="{% static 'js/news.js' %}"></script>
                 <table class="table">
                     <thead>
@@ -59,50 +62,10 @@
                             <th><input type="text" class="form-control" placeholder="Author"></th>
                             <th><p>Comments</th>
                             <th><p>Points</th>
-                            <th><p>Your Score</th>
                         </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                          <td style="background-color: #00FF00">Good</td>
-                          <td style="background-color: #00FF00"></td>
-                          <td style="background-color: #00FF00"></td>
-                          <td style="background-color: #00FF00"></td>
-                          <td style="background-color: #00FF00"></td>
-                      </tr>
-                      {% for row in good %}
-                        <tr>
-                            <td>{{row.id}}</td>
-                            <td><a href = "{{row.url}}">{{row.title}}</a></td>
-                            <td>{{row.author}}</td>
-                            <td>{{row.comments}}</td>
-                            <td>{{row.points}}</td>
-                        </tr>
-                        {% endfor %}
-                        <tr>
-                            <td style="background-color: #FFFF00">Maybe</td>
-                            <td style="background-color: #FFFF00"></td>
-                            <td style="background-color: #FFFF00"></td>
-                            <td style="background-color: #FFFF00"></td>
-                            <td style="background-color: #FFFF00"></td>
-                        </tr>
-                      {% for row in maybe %}
-                        <tr>
-                            <td>{{row.id}}</td>
-                            <td><a href = "{{row.url}}">{{row.title}}</a></td>
-                            <td>{{row.author}}</td>
-                            <td>{{row.comments}}</td>
-                            <td>{{row.points}}</td>
-                        </tr>
-                        {% endfor %}
-                        <tr>
-                            <td style="background-color: #FF0000">Never</td>
-                            <td style="background-color: #FF0000"></td>
-                            <td style="background-color: #FF0000"></td>
-                            <td style="background-color: #FF0000"></td>
-                            <td style="background-color: #FF0000"></td>
-                        </tr>
-                      {% for row in never %}
+                      {% for row in fav_news %}
                         <tr>
                             <td>{{row.id}}</td>
                             <td><a href = "{{row.url}}">{{row.title}}</a></td>
@@ -115,6 +78,6 @@
                 </table>
             </div>
         </div>
-    </div>
+     </div>
   </body>
 </html>

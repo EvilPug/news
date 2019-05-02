@@ -17,10 +17,10 @@
         <nav class="navbar navbar-inverse navbar-fixed-top">
           <div class="container-fluid">
             <div class="navbar-header">
-              <a class="navbar-brand" href="#">Hybrid</a>
+              <a class="navbar-brand" href="/">Hybrid</a>
             </div>
-            {%if user == 'evillpug'%}
-            <form class="navbar-form navbar-left" action="update_news/" method="post">
+            {% if user.username == 'evilpug' %}
+            <form class="navbar-form navbar-left" action="{% url 'polls:update_news' %}" method="post">
               <div class="input-group">
                 {% csrf_token %}
                 <input type="text" name="n_pages" class="form-control" placeholder="Число страниц">
@@ -31,25 +31,29 @@
                 </div>
               </div>
             </form>
-            {%endif%}
+            {% endif %}
 
             <ul class="nav navbar-nav">
-              <li><a href="recommendations/">Рекомендации</a></li>
-              <li><a href="favorite/">Избранное</a></li>
+              <li><a href="{% url 'polls:recommendations' %}">Рекомендации</a></li>
+              <li><a href="{% url 'polls:favorite' %}">Избранное</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
               <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">{{user}}<span class="caret"></span></a>
+                {% if user.is_authenticated %}
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">{{ user.username }}<span class="caret"></span></a>
                 <ul class="dropdown-menu">
-                  <li><a href="logout/">Logout</a></li>
+                  <li><a href="{% url 'accounts:logout' %}">Logout</a></li>
                 </ul>
+                {% else %}
+                <a class="dropdown-toggle" href="{% url 'accounts:login' %}">Login</a>
+                {% endif %}
               </li>
             </ul>
           </div>
         </nav>
         <div class="row">
+          <h5 class = "counter">Непрочитанных новостей: {{count}}</h5>
             <div class="panel panel-default filterable">
-              <h5 class = "counter">Непрочитанных новостей: {{count}}</h5>
                 <script type="text/javascript" src ="{% static 'js/news.js' %}"></script>
                 <table class="table">
                     <thead>

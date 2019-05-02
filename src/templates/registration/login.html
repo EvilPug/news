@@ -20,15 +20,15 @@
           <br><h3>Sign In</h3>
         </div>
         <div class="input">
-          <form action="#" method="post">
-              {% csrf_token %}
-              <th><input type="text" name="username" class="form-control" placeholder="Username"></th><br>
-              <th><input type="password" name="password" class="form-control" placeholder="Password"></th><br>
-              <th><input type="submit" class="btn btn-primary"></th>
+          <form action="{% url 'accounts:login' %}" method="post" accept-charset="utf-8">
+            {% csrf_token %}
+            {% include 'includes/form.html' %}
+            <input type="hidden" name="next" value="{{ next }}" />
+            <input class="btn btn-success" type="submit" value="Submit"/>
           </form>
         </div>
         <div class="text">
-          <br>Don't have an account?<a href="signup/">Sign Up</a>
+          <br>Don't have an account?<a href="{% url 'accounts:signup' %}">Sign Up</a>
         </div>
       </div>
     </div>
