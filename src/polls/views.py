@@ -12,7 +12,7 @@ from polls.bayes import NaiveBayesClassifier
 
 def index(request):
     # import pdb; pdb.set_trace()
-    if request.user == 'AnonymousUser':
+    if request.user != 'AnonymousUser':
         user = User.objects.get(username=request.user)
         labels = set(user.news_labeled.split(" "))
         ids = []
