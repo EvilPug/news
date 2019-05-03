@@ -1,38 +1,44 @@
 import os
 
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 
 SECRET_KEY = '9nss9)$cq&rn+1dl%hdsrf2z+jf78_x$72+9)(ahq-n$y0*riy'
 
+
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
 
+ALLOWED_HOSTS = ['*']
 
 
 INSTALLED_APPS = [
     'news',
     'accounts',
     'widget_tweaks',
-    'django.contrib.admin',
     'django.contrib.auth',
-    'django.contrib.contenttypes',
+    'django.contrib.admin',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles'
+    'django.contrib.staticfiles',
+    'django.contrib.contenttypes',
 ]
+
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
 ]
 
+
 ROOT_URLCONF = 'config.urls'
+
 
 TEMPLATES = [
     {
@@ -50,11 +56,10 @@ TEMPLATES = [
     },
 ]
 
+
+
 WSGI_APPLICATION = 'config.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
@@ -63,9 +68,6 @@ DATABASES = {
     }
 }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -83,22 +85,21 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/2.1/topics/i18n/
-
 LANGUAGE_CODE = 'ru-RU'
-
 TIME_ZONE = 'Europe/Moscow'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.1/howto/static-files/
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'help.hybridcraft@gmail.com'
+EMAIL_HOST_PASSWORD = 'mops228MOPS'
+DEFAULT_FROM_EMAIL = 'HybridCraft'
+DEFAULT_TO_EMAIL = 'help.hybridcraft@gmail.com'
+
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = ['./static']

@@ -1,6 +1,7 @@
 from django.shortcuts import render
-from django.contrib.auth import authenticate, login
+from django.core.mail import send_mail
 from django.views.generic import FormView
+from django.contrib.auth import authenticate, login
 
 from accounts.forms import UserCreationForm
 
@@ -11,12 +12,20 @@ class RegisterView(FormView):
     success_url = '/'
 
     def form_valid(self, form):
-        form.save(force_insert = True)
+        user = form.save()
 
         username = self.request.POST['username']
         email = self.request.POST['email']
         password = self.request.POST['password1']
 
-        user = authenticate(email=email, password=password)
+        message = """
+        Добро пожаловать на сайт, {}.
+
+        Твой пароль: {}
+        """.format(username, password)
+
+        send_mail('Welcome!', message, 'HybridCraft',
+                  [email], fail_silently=False)
+
         login(self.request, user)
         return super(RegisterView, self).form_valid(form)

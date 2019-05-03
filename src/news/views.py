@@ -9,20 +9,28 @@ from news.bayes import NaiveBayesClassifier
 
 
 def index(request):
-    if request.user != 'AnonymousUser':
 
+    if request.user.is_authenticated:
         user = User.objects.get(username=request.user)
-        labels = set(user.news_labeled.split(" "))
-        ids = [i.split(':')[0] for i in list(labels)]
-        rows = NewsModel.objects.exclude(pk__in=ids)
+
+        if user.news_labeled != '':
+            labels = set(user.news_labeled.split(" "))
+            ids = [i.split(':')[0] for i in list(labels)]
+            rows = NewsModel.objects.exclude(pk__in=ids)
+            fav = set(int(id) for id in user.favorite.split(" "))
+        else:
+            rows = NewsModel.objects.all()
+            fav = []
+        count = len(rows)
+        return render(request, 'news/index.html',
+                      {'rows': rows, 'count': count, 'fav:': fav})
 
     else:
         rows = NewsModel.objects.all()
 
     count = len(rows)
-    fav = set(int(id) for id in user.favorite.split(" "))
     return render(request, 'news/index.html',
-                  {'rows': rows, 'count': count, 'fav:': fav})
+                  {'rows': rows, 'count': count})
 
 
 @login_required
@@ -52,8 +60,13 @@ def add_favorite(request):
 @login_required
 def favorite(request):
     user = User.objects.get(username=request.user)
-    ids = set(user.favorite.split(" "))
-    fav_news = NewsModel.objects.filter(pk__in=ids)
+
+    if user.news_labeled != '':
+        ids = set(user.favorite.split(" "))
+        fav_news = NewsModel.objects.filter(pk__in=ids)
+    else:
+        fav_news = ['Nothing to see here']
+
     return render(request, 'news/favorite.html',
                   {'fav_news': fav_news})
 

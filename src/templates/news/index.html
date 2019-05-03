@@ -63,7 +63,9 @@
                             <th><input type="text" class="form-control" placeholder="Author"></th>
                             <th><p>Comments</th>
                             <th><p>Points</th>
+                            {% if user.is_authenticated %}
                             <th><p>Favorite</th>
+                            {% endif %}
                             <th><p>Your Score</th>
                         </tr>
                     </thead>
