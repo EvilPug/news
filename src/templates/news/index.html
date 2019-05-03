@@ -1,7 +1,7 @@
 {% load staticfiles %}
 <html lang="ru">
   <head>
-    <title>Recommended News</title>
+    <title>News</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -19,8 +19,8 @@
             <div class="navbar-header">
               <a class="navbar-brand" href="/">Hybrid</a>
             </div>
-            {%if user.username == 'evilpug'%}
-            <form class="navbar-form navbar-left" action="update_news/" method="post">
+            {% if user.username == 'evilpug' %}
+            <form class="navbar-form navbar-left" action="{% url 'news:update_news' %}" method="post">
               <div class="input-group">
                 {% csrf_token %}
                 <input type="text" name="n_pages" class="form-control" placeholder="Число страниц">
@@ -31,11 +31,11 @@
                 </div>
               </div>
             </form>
-            {%endif%}
+            {% endif %}
 
             <ul class="nav navbar-nav">
-              <li><a href="{% url 'polls:recommendations' %}">Рекомендации</a></li>
-              <li><a href="{% url 'polls:favorite' %}">Избранное</a></li>
+              <li><a href="{% url 'news:recommendations' %}">Рекомендации</a></li>
+              <li><a href="{% url 'news:favorite' %}">Избранное</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
               <li class="dropdown">
@@ -45,13 +45,14 @@
                   <li><a href="{% url 'accounts:logout' %}">Logout</a></li>
                 </ul>
                 {% else %}
-                <a class="dropdown-toggle" data-toggle="dropdown" href="/accounts/login/">Login<span class="caret"></span></a>
+                <a class="dropdown-toggle" href="{% url 'accounts:login' %}">Login</a>
                 {% endif %}
               </li>
             </ul>
           </div>
         </nav>
         <div class="row">
+          <h5 class = "counter">Непрочитанных новостей: {{count}}</h5>
             <div class="panel panel-default filterable">
                 <script type="text/javascript" src ="{% static 'js/news.js' %}"></script>
                 <table class="table">
@@ -62,55 +63,46 @@
                             <th><input type="text" class="form-control" placeholder="Author"></th>
                             <th><p>Comments</th>
                             <th><p>Points</th>
+                            <th><p>Favorite</th>
+                            <th><p>Your Score</th>
                         </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                          <td style="background-color: #00FF00">Good {{ good.count }}</td>
-                          <td style="background-color: #00FF00"></td>
-                          <td style="background-color: #00FF00"></td>
-                          <td style="background-color: #00FF00"></td>
-                          <td style="background-color: #00FF00"></td>
-                      </tr>
-                      {% for row in good.news %}
+                      {% for row in rows %}
                         <tr>
-                            <td>{{row.id}}</td>
+                            <td >{{row.id}}</td>
                             <td><a href = "{{row.url}}">{{row.title}}</a></td>
                             <td>{{row.author}}</td>
                             <td>{{row.comments}}</td>
                             <td>{{row.points}}</td>
-                        </tr>
-                        {% endfor %}
-                        <tr>
-                            <td style="background-color: #FFFF00">Maybe {{ maybe.count }}</td>
-                            <td style="background-color: #FFFF00"></td>
-                            <td style="background-color: #FFFF00"></td>
-                            <td style="background-color: #FFFF00"></td>
-                            <td style="background-color: #FFFF00"></td>
-                        </tr>
-                      {% for row in maybe.news %}
-                        <tr>
-                            <td>{{row.id}}</td>
-                            <td><a href = "{{row.url}}">{{row.title}}</a></td>
-                            <td>{{row.author}}</td>
-                            <td>{{row.comments}}</td>
-                            <td>{{row.points}}</td>
-                        </tr>
-                        {% endfor %}
-                        <tr>
-                            <td style="background-color: #FF0000">Never {{ never.count }}</td>
-                            <td style="background-color: #FF0000"></td>
-                            <td style="background-color: #FF0000"></td>
-                            <td style="background-color: #FF0000"></td>
-                            <td style="background-color: #FF0000"></td>
-                        </tr>
-                      {% for row in never.news %}
-                        <tr>
-                            <td>{{row.id}}</td>
-                            <td><a href = "{{row.url}}">{{row.title}}</a></td>
-                            <td>{{row.author}}</td>
-                            <td>{{row.comments}}</td>
-                            <td>{{row.points}}</td>
+                            {% if user.is_authenticated %}
+                            <td><form action="{% url 'news:add_favorite' %}" method="post">
+                                  {% csrf_token %}
+                                  {% if row.id in fav %}
+                                  yayy
+                                  <div class = "fav-checked">
+                                    <input type="submit" id="fav{{row.id}}" name="favorite" value="{{row.id}}" />
+                                    <label for="fav{{row.id}}" title="Favorite">Favorite</label>
+                                  </div>
+                                  {% else %}
+                                  <div class = "fav">
+                                    <input type="submit" id="fav{{row.id}}" name="favorite" value="{{row.id}}" />
+                                    <label for="fav{{row.id}}" title="Favorite">Favorite</label>
+                                  </div>
+                                  {% endif %}
+                                </form></td>
+                            {% endif %}
+                            <td><form action="{% url 'news:add_label' %}" method="post">
+                                  {% csrf_token %}
+                                  <div class = "rate">
+                                    <input type="submit" id="star2{{row.id}}" name="label" value="{{row.id}}:2" />
+                                    <label for="star2{{row.id}}" title="Интересно">2 stars</label>
+                                    <input type="submit" id="star1{{row.id}}" name="label" value="{{row.id}}:1" />
+                                    <label for="star1{{row.id}}" title="Возможно интересно">1 stars</label>
+                                    <input type="submit" id="star0{{row.id}}" name="label" value="{{row.id}}:0" />
+                                    <label for="star0{{row.id}}" title="Не интеренсно">0 star</label>
+                                  </div>
+                                </form></td>
                         </tr>
                         {% endfor %}
                     </tbody>

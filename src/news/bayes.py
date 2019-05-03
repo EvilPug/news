@@ -17,9 +17,9 @@ class NaiveBayesClassifier:
         self.labels.sort()
         self.amount = len(self.labels)
 
-        dict = [[] for l in range(len(X))]
+        docs = [[] for l in range(len(X))]
         for i in range(len(X)):
-            dict[i] = [X[i], y[i]]
+            docs[i] = [X[i], y[i]]
 
         table = {}
 
@@ -32,15 +32,15 @@ class NaiveBayesClassifier:
             for i in range(len(X)):
                 words = X[i].split()
                 for word in words:
-                    if dict[i][1] == self.labels[k]:
+                    if docs[i][1] == self.labels[k]:
                         table[word][k] += 1
 
         for i in range(self.amount):
             counter = collections.Counter()
-            for j in dict:
+            for j in docs:
                 counter[j[1]] += 1
 
-        D = len(dict)
+        D = len(docs)
         self.p_labels = [math.log(counter[label] / D) for label in self.labels]
 
         V = len(table)
@@ -66,20 +66,20 @@ class NaiveBayesClassifier:
     def predict(self, X: list) -> dict:
         """ Perform classification on an array of test vectors X. """
 
-        list = {}
+        predictions = {}
         for line in X:
-            list[line] = [i for i in self.p_labels]
+            predictions[line] = [i for i in self.p_labels]
             words = line.split()
             for word in words:
                 if word in self.chance:
                     for i in range(len(self.labels)):
-                        list[line][i] += math.log(self.chance[word][i])
+                        predictions[line][i] += math.log(self.chance[word][i])
 
             for i in range(len(self.labels)):
-                if list[line][i] == max(list[line]):
-                    list[line] = self.labels[i]
+                if predictions[line][i] == max(predictions[line]):
+                    predictions[line] = self.labels[i]
                     break
-        return list
+        return predictions
 
     def score(self, X_test: list, y_test: list) -> float:
         """ Returns the mean accuracy on the given test data and labels. """
@@ -95,6 +95,3 @@ class NaiveBayesClassifier:
             if test[line] == testdict[line]:
                 correct += 1
         return correct / len(y_test)
-
-if __name__ == '__main__':
-    print('OK')

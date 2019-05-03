@@ -9,7 +9,6 @@ def extract_news(parser) -> list:
     tbl_list = parser.table.find_all('table')
     tr_list = tbl_list[1].find_all('tr')
 
-
     n = 0
     for i in range(30):
             a_list_title = tr_list[n].find_all('a')

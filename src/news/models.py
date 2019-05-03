@@ -3,7 +3,6 @@ from django.utils import timezone
 
 
 class NewsModel(models.Model):
-    id = models.AutoField(max_length=5, primary_key = True)
     title = models.CharField(max_length = 80)
     author = models.CharField(max_length=15)
     url = models.CharField(max_length = 400)

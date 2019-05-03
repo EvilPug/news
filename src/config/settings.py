@@ -11,7 +11,7 @@ ALLOWED_HOSTS = ['*']
 
 
 INSTALLED_APPS = [
-    'polls',
+    'news',
     'accounts',
     'widget_tweaks',
     'django.contrib.admin',
@@ -32,7 +32,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'news.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
@@ -50,7 +50,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'news.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
