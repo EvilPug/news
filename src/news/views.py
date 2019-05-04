@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, HttpResponse, redirect
+from django.views.generic import *
 
 from accounts.models import User
 from news.models import NewsModel
@@ -17,7 +18,7 @@ def index(request):
             labels = set(user.news_labeled.split(" "))
             ids = [i.split(':')[0] for i in list(labels)]
             rows = NewsModel.objects.exclude(pk__in=ids)
-            fav = set(int(id) for id in user.favorite.split(" "))
+            fav = set(int(id) for id in user.favorite.split(" ") if user.favorite != '')
         else:
             rows = NewsModel.objects.all()
             fav = []
@@ -61,7 +62,7 @@ def add_favorite(request):
 def favorite(request):
     user = User.objects.get(username=request.user)
 
-    if user.news_labeled != '':
+    if user.favorite != '':
         ids = set(user.favorite.split(" "))
         fav_news = NewsModel.objects.filter(pk__in=ids)
     else:

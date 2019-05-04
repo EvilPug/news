@@ -5,24 +5,25 @@ from django.contrib.auth.models import PermissionsMixin
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
-    def create_user(self, email, password=None):
+    def create_user(self, email, username, password=None):
         """
         Creates and saves a User with the given email and password.
         """
         if email is None:
             raise ValueError('User must have an email address.')
         user = self.model(email=self.normalize_email(email))
+        user.username = username
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None):
+    def create_superuser(self, email, username, password=None):
         """
         Creates and saves a superuser with the given email and password.
         """
         if password is None:
             raise ValueError('Superusers must have a password.')
-        user = self.create_user(email, password)
+        user = self.create_user(email, username, password)
         user.is_superuser = True
         user.is_staff = True
         user.save(using=self._db)
