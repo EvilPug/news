@@ -53,23 +53,6 @@
         </nav>
         <div class="row">
           <h5 class = "counter">Непрочитанных новостей: {{count}}</h5>
-          {% if is_paginated %}
-          <div class="pagination">
-             <span class="step-links">
-                 {% if page_obj.has_previous %}
-                     <a href="?page={{ page_obj.previous_page_number }}">previous</a>
-                 {% endif %}
-
-                 <span class="current">
-                     Page {{ page_obj.number }} out of {{ page_obj.paginator.num_pages }}
-                 </span>
-
-                 {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}">next</a>
-                 {% endif %}
-            </span>
-          </div>
-          {% endif %}
             <div class="panel panel-default filterable">
                 <script type="text/javascript" src ="{% static 'js/news.js' %}"></script>
                 <table class="table">
@@ -87,7 +70,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                      {% for row in page_obj %}
+                      {% for row in rows %}
                         <tr>
                             <td >{{row.id}}</td>
                             <td><a href = "{{row.url}}">{{row.title}}</a></td>
@@ -98,6 +81,7 @@
                             <td><form action="{% url 'news:add_favorite' %}" method="post">
                                   {% csrf_token %}
                                   {% if row.id in fav %}
+                                  yayy
                                   <div class = "fav-checked">
                                     <input type="submit" id="fav{{row.id}}" name="favorite" value="{{row.id}}" />
                                     <label for="fav{{row.id}}" title="Favorite">Favorite</label>
@@ -126,23 +110,6 @@
                     </tbody>
                 </table>
             </div>
-            {% if is_paginated %}
-            <div class="pagination">
-               <span class="step-links">
-                   {% if page_obj.has_previous %}
-                       <a href="?page={{ page_obj.previous_page_number }}">previous</a>
-                   {% endif %}
-
-                   <span class="current">
-                       Page {{ page_obj.number }} out of {{ page_obj.paginator.num_pages }}
-                   </span>
-
-                   {% if page_obj.has_next %}
-                      <a href="?page={{ page_obj.next_page_number }}">next</a>
-                   {% endif %}
-              </span>
-            </div>
-            {% endif %}
         </div>
     </div>
   </body>
