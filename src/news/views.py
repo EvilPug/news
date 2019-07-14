@@ -1,7 +1,10 @@
+from django.views.generic import *
+from django.urls import reverse_lazy, reverse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, HttpResponse, redirect
-from django.views.generic import *
+from django.http import HttpResponseRedirect
 
 from accounts.models import User
 from news.models import NewsModel
@@ -9,41 +12,38 @@ from news.scraputils import get_news
 from news.bayes import NaiveBayesClassifier
 
 
-def index(request):
 
-    if request.user.is_authenticated:
-        user = User.objects.get(username=request.user)
+class NewsList(LoginRequiredMixin, ListView):
+    paginate_by = 50
+    template_name = 'news/index.html'
+    context_object_name = 'latest_news_list'
 
-        if user.news_labeled != '':
-            labels = set(user.news_labeled.split(" "))
+    def get_queryset(self):
+        if self.request.user.news_labeled != '':
+            labels = set(self.request.user.news_labeled.split(" "))
             ids = [i.split(':')[0] for i in list(labels)]
             rows = NewsModel.objects.exclude(pk__in=ids)
-            fav = set(int(id) for id in user.favorite.split(" ") if user.favorite != '')
+            fav = set(int(id) for id in self.request.user.favorite.split(" ") if self.request.user.favorite != '')
         else:
             rows = NewsModel.objects.all()
             fav = []
         count = len(rows)
-        return render(request, 'news/index.html',
-                      {'rows': rows, 'count': count, 'fav:': fav})
+        return rows
 
-    else:
-        rows = NewsModel.objects.all()
+class NewsAddLabel(NewsList, LoginRequiredMixin, ListView):
 
-    count = len(rows)
-    return render(request, 'news/index.html',
-                  {'rows': rows, 'count': count})
+    def get_queryset(self):
+            user = User.objects.get(username=self.request.user)
+            if user.news_labeled == "":
+                user.news_labeled = self.request.POST['label']
 
+            user.news_labeled += " " + self.request.POST['label']
+            user.save()
 
-@login_required
-def add_label(request):
-    if request.POST:
-        user = User.objects.get(username=request.user)
-        if user.news_labeled == "":
-            user.news_labeled = request.POST['label']
-
-        user.news_labeled += " " + request.POST['label']
-        user.save()
-    return redirect('/')
+            labels = set(self.request.user.news_labeled.split(" "))
+            ids = [i.split(':')[0] for i in list(labels)]
+            rows = NewsModel.objects.exclude(pk__in=ids)
+            return HttpResponseRedirect(self.request.path_info)
 
 
 @login_required
