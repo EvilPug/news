@@ -98,7 +98,6 @@
                             <td><form action="{% url 'news:add_favorite' %}" method="post">
                                   {% csrf_token %}
                                   {% if row.id in fav %}
-                                  yayy
                                   <div class = "fav-checked">
                                     <input type="submit" id="fav{{row.id}}" name="favorite" value="{{row.id}}" />
                                     <label for="fav{{row.id}}" title="Favorite">Favorite</label>
