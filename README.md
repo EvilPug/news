@@ -2,16 +2,10 @@
 
 <h3>Как развернуть проект локально?</h3>
 
-<b>а) С помощью Docker</b>
+<b>С помощью Docker</b>
 
     docker-compose build
     docker-compose up -d
-
-<b>б) Самостоятельно</b>
-
-    pip install -r requirements/base.txt
-    cd ./src/
-    python3 manage.py runserver
 
 <br>
 <i>Запущенный сервер доступен по адресу 127.0.0.1:8000</i>
